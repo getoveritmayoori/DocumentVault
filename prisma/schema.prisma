@@ -1,0 +1,33 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Collection {
+  id        String     @id @default(uuid())
+  name      String
+  slug      String     @unique
+  createdAt DateTime   @default(now())
+  documents Document[]
+
+  @@map("collections")
+}
+
+model Document {
+  id           String     @id @default(uuid())
+  title        String
+  content      String
+  tags         String[]
+  collectionId String
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  isArchived   Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+
+  @@index([collectionId])
+  @@index([isArchived])
+  @@map("documents")
+}
